@@ -12,20 +12,23 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f0f4f8;
         }
         .card {
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 30px;
         }
         h1 {
             color: #2c3e50;
             margin-bottom: 10px;
+            text-align: center;
         }
         p {
             color: #7f8c8d;
             margin-bottom: 20px;
+            text-align: center;
         }
         .question {
             margin-bottom: 30px;
@@ -66,25 +69,43 @@
         .option-2:hover { background-color: #fcf3cf; }
         .option-3:hover { background-color: #fae5d3; }
         .option-4:hover { background-color: #fadbd8; }
-        button {
+        .calculate-button {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 15px 30px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
         }
-        button:hover {
+        .calculate-button:hover {
             background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(52, 152, 219, 0.4);
+        }
+        .calculate-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.4);
         }
         #result {
-            margin-top: 20px;
+            margin-top: 30px;
             padding: 20px;
             background-color: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 12px;
             text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        #result.show {
+            opacity: 1;
+            transform: translateY(0);
         }
         .score-grid {
             display: grid;
@@ -93,21 +114,34 @@
             margin-bottom: 20px;
         }
         .score-box {
-            padding: 15px;
-            border-radius: 8px;
+            padding: 20px;
+            border-radius: 12px;
             text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .score-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
         .score-box:nth-child(1) { background-color: #e8f6f3; }
         .score-box:nth-child(2) { background-color: #e8f8f5; }
         .score-value {
-            font-size: 24px;
+            font-size: 36px;
             font-weight: bold;
             margin-top: 10px;
+            color: #2c3e50;
         }
         .total-score {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             margin-top: 20px;
+            color: #3498db;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -116,7 +150,7 @@
         <h1>ADHD 评估问卷</h1>
         <p>请选择最能描述你过去六个月中的感受与行为的正确分数。A部分测试的是不专心程度，B部分测试的是过动/冲动程度。</p>
         <div id="quiz"></div>
-        <button onclick="calculateResult()">计算结果</button>
+        <button class="calculate-button" onclick="calculateResult()">计算结果</button>
         <div id="result"></div>
     </div>
 
@@ -207,6 +241,14 @@
                 </div>
                 <div class="total-score">总分: ${total}</div>
             `;
+            resultElement.classList.add('show');
+
+            // Add pulse animation to the total score
+            const totalScoreElement = resultElement.querySelector('.total-score');
+            totalScoreElement.style.animation = 'pulse 1s ease-in-out';
+            setTimeout(() => {
+                totalScoreElement.style.animation = '';
+            }, 1000);
         }
 
         renderQuiz();
