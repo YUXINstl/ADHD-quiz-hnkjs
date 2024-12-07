@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD 评估问卷</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .question {
+            margin-bottom: 30px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        .option {
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            transform: scale(1.05);
+        }
+        .option:active {
+            transform: scale(0.95);
+        }
+        .option.selected {
+            border-color: #3498db;
+        }
+        .option-0 { background-color: #e8f8f5; }
+        .option-1 { background-color: #e8f6f3; }
+        .option-2 { background-color: #fef9e7; }
+        .option-3 { background-color: #fdf2e9; }
+        .option-4 { background-color: #fdedec; }
+        .option-0:hover { background-color: #d1f2eb; }
+        .option-1:hover { background-color: #d0ece7; }
+        .option-2:hover { background-color: #fcf3cf; }
+        .option-3:hover { background-color: #fae5d3; }
+        .option-4:hover { background-color: #fadbd8; }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .score-box {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .score-box:nth-child(1) { background-color: #e8f6f3; }
+        .score-box:nth-child(2) { background-color: #e8f8f5; }
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .total-score {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>ADHD 评估问卷</h1>
+        <p>请选择最能描述你过去六个月中的感受与行为的正确分数。A部分测试的是不专心程度，B部分测试的是过动/冲动程度。</p>
+        <div id="quiz"></div>
+        <button onclick="calculateResult()">计算结果</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            "当必须进行一件枯燥或困难的计划时，你粗心犯错的频率？",
+            "当正在做枯燥或重复性的工作时，你会经常性地难以持续专注吗？",
+            "即使有人直接对你说话，你会经常性地很难专注于别人跟你讲话的内容吗？",
+            "一旦完成任何计划中最具挑战部分后，你会常难以完成计划最后细节吗？",
+            "当必须从事需要有组织规划性的任务时，你会经常难以井然有序地去做吗？",
+            "当有一件需要多费心思考的工作时，你会经常逃避或是延后开始去做吗？",
+            "在家里或是在工作时，你会经常没有把东西放对地方或是找不到东西吗？",
+            "你会经常因身旁的活动或声音而分心？",
+            "你会经常忘记约会或是必须要做的事吗？",
+            "当你必须长时间坐着时，你会经常坐不安稳或扭动手脚吗？",
+            "你会经常在开会时或在其他被期待坐好的场合中离开座位吗？",
+            "你会经常觉得静不下来或烦躁不安？",
+            "当有自己独处的时间时，你会经常觉得难以平静和放松吗？",
+            "你会经常像被马达所驱动一样，觉得自己过度地活跃，不得不做事情？",
+            "在社交场合中，你是否经常发现自己话讲得太多？",
+            "当与他人交谈时，你会常在别人没讲完话前就插嘴或替对方讲完吗？",
+            "在需要轮流排队的场合时，你常感觉很难耐心等待吗？",
+            "你会经常在别人忙碌时打断别人吗？"
+        ];
+
+        const options = [
+            { value: "0", label: "从不" },
+            { value: "1", label: "很少" },
+            { value: "2", label: "有时" },
+            { value: "3", label: "常常" },
+            { value: "4", label: "非常频繁" }
+        ];
+
+        const answers = new Array(18).fill('');
+
+        function renderQuiz() {
+            const quizElement = document.getElementById('quiz');
+            quizElement.innerHTML = questions.map((question, index) => `
+                <div class="question">
+                    <div class="question-text">
+                        ${index < 9 ? 'A' : 'B'}${(index % 9) + 1}. ${question}
+                    </div>
+                    <div class="options">
+                        ${options.map(option => `
+                            <div class="option option-${option.value}" onclick="selectOption(${index}, '${option.value}', this)">
+                                <div>${option.label}</div>
+                                <div>${option.value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectOption(questionIndex, value, element) {
+            answers[questionIndex] = value;
+            const questionElement = element.closest('.question');
+            questionElement.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function calculateResult() {
+            const partA = answers.slice(0, 9).reduce((sum, answer) => sum + parseInt(answer || 0), 0);
+            const partB = answers.slice(9).reduce((sum, answer) => sum + parseInt(answer || 0), 0);
+            const total = partA + partB;
+
+            let result;
+            if (total <= 16) {
+                result = "不太可能有ADHD";
+            } else if (total <= 23) {
+                result = "很可能有ADHD";
+            } else {
+                result = "非常可能有ADHD";
+            }
+
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = `
+                <h2>结果: ${result}</h2>
+                <div class="score-grid">
+                    <div class="score-box">
+                        <div>A部分得分 (不专心)</div>
+                        <div class="score-value">${partA}</div>
+                    </div>
+                    <div class="score-box">
+                        <div>B部分得分 (过动/冲动)</div>
+                        <div class="score-value">${partB}</div>
+                    </div>
+                </div>
+                <div class="total-score">总分: ${total}</div>
+            `;
+        }
+
+        renderQuiz();
+    </script>
+</body>
+</html>
